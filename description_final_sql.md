@@ -153,9 +153,10 @@ REFERENCES bookings(book_ref)
  Столбец             |     Тип     | Модификаторы |          Описание   
  -------------       | ----------- | ------------ | -----------------        
  flight_id           | serial      | NOT NULL     | Идентификатор рейса 
- flight_no           | char(6)     | NOT NULL     | Номер рейса scheduled_
- departure           | timestamptz | NOT NULL     | Время вылета по расписанию 
- scheduled_arrival   | timestamptz | NOT NULL     | Время прилёта по расписанию departure_airport   | char(3)     | NOT NULL     | Аэропорт отправления 
+ flight_no           | char(6)     | NOT NULL     | Номер рейса 
+ scheduled_departure | timestamptz | NOT NULL     | Время вылета по расписанию 
+ scheduled_arrival   | timestamptz | NOT NULL     | Время прилёта по расписанию 
+ departure_airport   | char(3)     | NOT NULL     | Аэропорт отправления 
  arrival_airport     | char(3)     | NOT NULL     | Аэропорт прибытия 
  status              | varchar(20) | NOT NULL     | Статус рейса 
  aircraft_code       | char(3)     | NOT NULL     | Код самолета, IATA 
