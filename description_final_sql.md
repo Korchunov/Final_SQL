@@ -1,7 +1,7 @@
 # **Итоговая работа**
 ### **Авиаперевозки**
 
-![Авиаперевозки](https://github.com/Korchunov/Final_SQL/blob/test/DB/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA1.PNG)
+![Авиаперевозки](https://github.com/Korchunov/Final_SQL/blob/test/DB/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5.PNG)
 
 ## Описание Базы Данных
 
