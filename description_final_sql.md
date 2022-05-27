@@ -17,7 +17,7 @@
 * tickets
 * view1
 
-В одно бронирование можно включить несколько пассажиров, каждому из которых выписывается отдельный билет (tickets). Билет имеет уникальный номер и содержит информацию о пассажире. Как таковой пассажир не является отдельной сущностью. Как имя, так и номер документа пассажира могут меняться с течением времени, так что невозможно однозначно найти все билеты одного человека; для простоты можно считать, что все пассажиры уникальны. 
+Основной сущностью является бронирование (bookings). В одно бронирование можно включить несколько пассажиров, каждому из которых выписывается отдельный билет (tickets). Билет имеет уникальный номер и содержит информацию о пассажире. Как таковой пассажир не является отдельной сущностью. Как имя, так и номер документа пассажира могут меняться с течением времени, так что невозможно однозначно найти все билеты одного человека; для простоты можно считать, что все пассажиры уникальны. 
 
 Билет включает один или несколько перелетов (ticket_flights). Несколько перелетов могут включаться в билет в случаях, когда нет нет прямого рейса, соединяющего пункты отправления и назначения (полет с пересадками), либо когда билет взят «туда и обратно». В схеме данных нет жесткого ограничения, но предполагается, что все билеты в одном бронировании имеют одинаковый набор перелетов. 
 
@@ -45,12 +45,14 @@
  book_date    | timestamptz   | NOT NULL     | Дата бронирования 
  total_amount | numeric(10,2) | NOT NULL     | Полная сумма бронирования 
  
-> Индексы:    
+> **Индексы:**   
 * PRIMARY KEY, btree (book_ref) 
  
-> Ссылки извне:    
+> **Ссылки извне:**    
 * TABLE "tickets" FOREIGN KEY (book_ref)
 REFERENCES bookings(book_ref)
+
+---
 
 ### Домен "**aircrafts**"
 
@@ -64,17 +66,19 @@ REFERENCES bookings(book_ref)
  model         | text    | NOT NULL     | Модель самолета 
  range         | integer | NOT NULL     | Максимальная дальность полета, км 
 
-> Индексы:    
+> **Индексы:**    
 * PRIMARY KEY, btree (aircraft_code) 
 
-> Ограничения-проверки:    
+> **Ограничения-проверки:**    
 * CHECK (range > 0) 
 
-> Ссылки извне:    
+> **Ссылки извне:**    
 * TABLE "flights" FOREIGN KEY (aircraft_code)        
  REFERENCES aircrafts(aircraft_code)    
  * TABLE "seats" FOREIGN KEY (aircraft_code)        
   REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE
+
+  ---
 
 ### Домен "**airports**"
 
@@ -93,14 +97,16 @@ REFERENCES bookings(book_ref)
  latitude     | float     | NOT NULL         | Координаты аэропорта: широта 
  timezone     | text      | NOT NULL         | Временная зона аэропорта 
  
- > Индексы:    
+ > **Индексы:**    
  * PRIMARY KEY, btree (airport_code) 
  
- >Ссылки извне:  
+ > **Ссылки извне:**  
  * TABLE "flights" FOREIGN KEY (arrival_airport)         
  REFERENCES airports(airport_code)    
  * TABLE "flights" FOREIGN KEY (departure_airport)         
  REFERENCES airports(airport_code)
+
+ ---
 
 ### Домен "**boarding_passes**"
 
@@ -117,14 +123,16 @@ REFERENCES bookings(book_ref)
   boarding_no | integer    | NOT NULL     | Номер посадочного талона 
   seat_no     | varchar(4) | NOT NULL     | Номер места 
   
-  > Индексы:    
+  > **Индексы:**    
   * PRIMARY KEY, btree (ticket_no, flight_id)   
   * UNIQUE CONSTRAINT, btree (flight_id, boarding_no)    
   * UNIQUE CONSTRAINT, btree (flight_id, seat_no) 
   
-  > Ограничения внешнего ключа:    
+  > **Ограничения внешнего ключа:**    
   * FOREIGN KEY (ticket_no, flight_id)         
   REFERENCES ticket_flights(ticket_no, flight_id)
+
+  ---
 
 ### Домен "**flights**"
 
@@ -160,20 +168,21 @@ REFERENCES bookings(book_ref)
  arrival_airport     | char(3)     | NOT NULL     | Аэропорт прибытия 
  status              | varchar(20) | NOT NULL     | Статус рейса 
  aircraft_code       | char(3)     | NOT NULL     | Код самолета, IATA 
- actual_departure    | timestamptz |              | Фактическое время вылета actual_arrival      | timestamptz |              | Фактическое время прилёта 
+ actual_departure    | timestamptz |              | Фактическое время вылета 
+ actual_arrival      | timestamptz |              | Фактическое время прилёта 
  
-> Индексы: 
+> **Индексы:** 
 
  * PRIMARY KEY, btree (flight_id)    
  
  * UNIQUE CONSTRAINT, btree (flight_no,scheduled_departure) 
   
-> Ограничения-проверки:
+> **Ограничения-проверки:**
 * CHECK (scheduled_arrival > scheduled_departure)    
 * CHECK ((actual_arrival IS NULL)       OR  ((actual_departure IS NOT NULL AND actual_arrival IS NOT NULL)            AND (actual_arrival > actual_departure)))   
 * CHECK (status IN ('On Time', 'Delayed', 'Departed',                       'Arrived', 'Scheduled', 'Cancelled')) 
   
->  Ограничения внешнего ключа:    
+>  **Ограничения внешнего ключа:**   
 * FOREIGN KEY (aircraft_code)         
 REFERENCES aircrafts(aircraft_code)    
 * FOREIGN KEY (arrival_airport)         
@@ -181,10 +190,12 @@ REFERENCES airports(airport_code)
 * FOREIGN KEY (departure_airport)        
  REFERENCES airports(airport_code) 
 
-> Ссылки извне:    
+> **Ссылки извне:** 
 * TABLE "ticket_flights" 
 FOREIGN KEY (flight_id)         
 REFERENCES flights(flight_id)
+
+---
 
 ### Домен "**seats**"
 
@@ -198,15 +209,17 @@ REFERENCES flights(flight_id)
  seat_no         | varchar(4)  | NOT NULL     | Номер места 
  fare_conditions | varchar(10) | NOT NULL     | Класс обслуживания 
  
-> Индексы:   
+> **Индексы:**   
 * PRIMARY KEY, btree (aircraft_code, seat_no) 
 
-> Ограничения-проверки:    
+> **Ограничения-проверки:**    
 * CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business')) 
 
-> Ограничения внешнего ключа:    
+> **Ограничения внешнего ключа:**    
 * FOREIGN KEY (aircraft_code)        
  REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE
+
+ ---
 
 ### Домен "**ticket_flights**"
 
@@ -221,22 +234,24 @@ REFERENCES flights(flight_id)
  fare_conditions | varchar(10)   | NOT NULL     | Класс обслуживания 
  amount          | numeric(10,2) | NOT NULL     | Стоимость перелета
 
-> Индексы:    
+> **Индексы:**    
 * PRIMARY KEY, btree (ticket_no, flight_id) 
 
-> Ограничения-проверки:   
+> **Ограничения-проверки:**   
 * CHECK (amount >= 0)    
 * CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business')) 
 
-> Ограничения внешнего ключа:    
+> **Ограничения внешнего ключа:**    
 * FOREIGN KEY (flight_id) 
 REFERENCES flights(flight_id)    
 * FOREIGN KEY (ticket_no) 
 REFERENCES tickets(ticket_no) 
 
-> Ссылки извне:    
+> **Ссылки извне:**    
 * TABLE "boarding_passes" FOREIGN KEY (ticket_no, flight_id)         
 REFERENCES ticket_flights(ticket_no, flight_id)
+
+---
 
 ### Домен "**tickets**"
 
@@ -252,16 +267,19 @@ REFERENCES ticket_flights(ticket_no, flight_id)
  passenger_name | text        | NOT NULL     | Имя пассажира 
  contact_data   | jsonb       |              | Контактные данные пассажира 
  
- > Индексы:   
-  * PRIMARY KEY, btree (ticket_no) 
+ > **Индексы:**   
+
+   `PRIMARY KEY, btree (ticket_no)`
   
-  > Ограничения внешнего ключа:    
+  > **Ограничения внешнего ключа:**    
   * FOREIGN KEY (book_ref) 
   REFERENCES bookings(book_ref) 
   
-  > Ссылки извне:    
+  > **Ссылки извне:**    
   * TABLE "ticket_flights" 
   FOREIGN KEY (ticket_no) 
   REFERENCES tickets(ticket_no)
+
+  ---
 
 ### Представление "**view1**"
