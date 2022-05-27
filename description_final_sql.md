@@ -3,19 +3,33 @@
 
 ![Авиаперевозки](https://github.com/Korchunov/Final_SQL/blob/test/DB/%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5.PNG)
 
+## Метаданные
+
+* Тип подключения - **локальный**
+* Версия - 1.0.0
+* Краткое описание: 
+База данных, содержащая информацию о пассажирских авиаперевозках
+
 ## Описание Базы Данных
 
-База данных, в которой производится работа, состоит из следующих сущностей:
+В этом документе описана схема данных, состоящая из восьми таблиц и трёх представлений, одно из которых материализованное. В качестве предметной области выбраны авиаперевозки по России.
 
-* bookings
-* aircrafts
-* airports
-* boarding_passes
-* flights
-* seats
-* ticket_flights
-* tickets
-* view1
+Сущности схемы данных:
+
+* Table
+  * bookings 
+  * aircrafts 
+  * airports 
+  * boarding_passes 
+  * flights 
+  * seats 
+  * ticket_flights 
+  * tickets 
+* View
+  * bookings.flights_v 
+  * view1 
+* Materialized view
+  * bookings.routes
 
 Основной сущностью является бронирование (bookings). В одно бронирование можно включить несколько пассажиров, каждому из которых выписывается отдельный билет (tickets). Билет имеет уникальный номер и содержит информацию о пассажире. Как таковой пассажир не является отдельной сущностью. Как имя, так и номер документа пассажира могут меняться с течением времени, так что невозможно однозначно найти все билеты одного человека; для простоты можно считать, что все пассажиры уникальны. 
 
@@ -351,10 +365,10 @@ city_arrival           |    text   | Город прибытия
 > **Синтаксис**
 
 `create view view1 as (
-	select a.city as city_departure, a2.city as city_arrival
-	from flights f 
-	join airports a on f.departure_airport = a.airport_code
-	join airports a2 on f.arrival_airport = a2.airport_code);`
+select a.city as city_departure, a2.city as city_arrival
+from flights f 
+join airports a on f.departure_airport = a.airport_code
+join airports a2 on f.arrival_airport = a2.airport_code);`
 
 ---
 
