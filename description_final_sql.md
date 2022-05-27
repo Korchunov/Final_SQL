@@ -45,12 +45,14 @@
  book_date    | timestamptz   | NOT NULL     | Дата бронирования 
  total_amount | numeric(10,2) | NOT NULL     | Полная сумма бронирования 
  
-> **Индексы:**   
-* PRIMARY KEY, btree (book_ref) 
+> **Индексы:**  
+
+`PRIMARY KEY, btree (book_ref)` 
  
-> **Ссылки извне:**    
-* TABLE "tickets" FOREIGN KEY (book_ref)
-REFERENCES bookings(book_ref)
+> **Ссылки извне:**  
+
+`TABLE "tickets" FOREIGN KEY (book_ref)
+REFERENCES bookings(book_ref)`
 
 ---
 
@@ -66,17 +68,20 @@ REFERENCES bookings(book_ref)
  model         | text    | NOT NULL     | Модель самолета 
  range         | integer | NOT NULL     | Максимальная дальность полета, км 
 
-> **Индексы:**    
-* PRIMARY KEY, btree (aircraft_code) 
+> **Индексы:**   
+
+`PRIMARY KEY, btree (aircraft_code)` 
 
 > **Ограничения-проверки:**    
-* CHECK (range > 0) 
+
+`CHECK (range > 0)` 
 
 > **Ссылки извне:**    
-* TABLE "flights" FOREIGN KEY (aircraft_code)        
- REFERENCES aircrafts(aircraft_code)    
- * TABLE "seats" FOREIGN KEY (aircraft_code)        
-  REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE
+
+`TABLE "flights" FOREIGN KEY (aircraft_code)        
+ REFERENCES aircrafts(aircraft_code)`    
+`TABLE "seats" FOREIGN KEY (aircraft_code)        
+REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE`
 
   ---
 
@@ -97,14 +102,16 @@ REFERENCES bookings(book_ref)
  latitude     | float     | NOT NULL         | Координаты аэропорта: широта 
  timezone     | text      | NOT NULL         | Временная зона аэропорта 
  
- > **Индексы:**    
- * PRIMARY KEY, btree (airport_code) 
+ > **Индексы:**  
+
+ `PRIMARY KEY, btree (airport_code)` 
  
- > **Ссылки извне:**  
- * TABLE "flights" FOREIGN KEY (arrival_airport)         
- REFERENCES airports(airport_code)    
- * TABLE "flights" FOREIGN KEY (departure_airport)         
- REFERENCES airports(airport_code)
+ > **Ссылки извне:** 
+
+ `TABLE "flights" FOREIGN KEY (arrival_airport)         
+ REFERENCES airports(airport_code)`    
+ `TABLE "flights" FOREIGN KEY (departure_airport)         
+ REFERENCES airports(airport_code)`
 
  ---
 
@@ -123,14 +130,16 @@ REFERENCES bookings(book_ref)
   boarding_no | integer    | NOT NULL     | Номер посадочного талона 
   seat_no     | varchar(4) | NOT NULL     | Номер места 
   
-  > **Индексы:**    
-  * PRIMARY KEY, btree (ticket_no, flight_id)   
-  * UNIQUE CONSTRAINT, btree (flight_id, boarding_no)    
-  * UNIQUE CONSTRAINT, btree (flight_id, seat_no) 
+  > **Индексы:**  
+
+  `PRIMARY KEY, btree (ticket_no, flight_id)`   
+  `UNIQUE CONSTRAINT, btree (flight_id, boarding_no) `   
+  `UNIQUE CONSTRAINT, btree (flight_id, seat_no) `
   
-  > **Ограничения внешнего ключа:**    
-  * FOREIGN KEY (ticket_no, flight_id)         
-  REFERENCES ticket_flights(ticket_no, flight_id)
+  > **Ограничения внешнего ключа:**
+
+  `FOREIGN KEY (ticket_no, flight_id)         
+  REFERENCES ticket_flights(ticket_no, flight_id)`
 
   ---
 
@@ -173,27 +182,30 @@ REFERENCES bookings(book_ref)
  
 > **Индексы:** 
 
- * PRIMARY KEY, btree (flight_id)    
+ `PRIMARY KEY, btree (flight_id)`    
  
- * UNIQUE CONSTRAINT, btree (flight_no,scheduled_departure) 
+ `UNIQUE CONSTRAINT, btree (flight_no,scheduled_departure)` 
   
 > **Ограничения-проверки:**
-* CHECK (scheduled_arrival > scheduled_departure)    
-* CHECK ((actual_arrival IS NULL)       OR  ((actual_departure IS NOT NULL AND actual_arrival IS NOT NULL)            AND (actual_arrival > actual_departure)))   
-* CHECK (status IN ('On Time', 'Delayed', 'Departed',                       'Arrived', 'Scheduled', 'Cancelled')) 
+
+`CHECK (scheduled_arrival > scheduled_departure)`    
+`CHECK ((actual_arrival IS NULL)       OR  ((actual_departure IS NOT NULL AND actual_arrival IS NOT NULL)            AND (actual_arrival > actual_departure)))`   
+`CHECK (status IN ('On Time', 'Delayed', 'Departed',                       'Arrived', 'Scheduled', 'Cancelled'))` 
   
->  **Ограничения внешнего ключа:**   
-* FOREIGN KEY (aircraft_code)         
-REFERENCES aircrafts(aircraft_code)    
-* FOREIGN KEY (arrival_airport)         
-REFERENCES airports(airport_code)    
-* FOREIGN KEY (departure_airport)        
- REFERENCES airports(airport_code) 
+>  **Ограничения внешнего ключа:** 
+
+`FOREIGN KEY (aircraft_code)         
+REFERENCES aircrafts(aircraft_code)`    
+`FOREIGN KEY (arrival_airport)         
+REFERENCES airports(airport_code)`    
+`FOREIGN KEY (departure_airport)        
+ REFERENCES airports(airport_code)` 
 
 > **Ссылки извне:** 
-* TABLE "ticket_flights" 
+
+`TABLE "ticket_flights" 
 FOREIGN KEY (flight_id)         
-REFERENCES flights(flight_id)
+REFERENCES flights(flight_id)`
 
 ---
 
@@ -209,15 +221,18 @@ REFERENCES flights(flight_id)
  seat_no         | varchar(4)  | NOT NULL     | Номер места 
  fare_conditions | varchar(10) | NOT NULL     | Класс обслуживания 
  
-> **Индексы:**   
-* PRIMARY KEY, btree (aircraft_code, seat_no) 
+> **Индексы:** 
 
-> **Ограничения-проверки:**    
-* CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business')) 
+`PRIMARY KEY, btree (aircraft_code, seat_no)` 
+
+> **Ограничения-проверки:**  
+
+`CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business'))` 
 
 > **Ограничения внешнего ключа:**    
-* FOREIGN KEY (aircraft_code)        
- REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE
+
+`FOREIGN KEY (aircraft_code)        
+ REFERENCES aircrafts(aircraft_code) ON DELETE CASCADE`
 
  ---
 
@@ -234,22 +249,27 @@ REFERENCES flights(flight_id)
  fare_conditions | varchar(10)   | NOT NULL     | Класс обслуживания 
  amount          | numeric(10,2) | NOT NULL     | Стоимость перелета
 
-> **Индексы:**    
-* PRIMARY KEY, btree (ticket_no, flight_id) 
+> **Индексы:** 
+
+`PRIMARY KEY, btree (ticket_no, flight_id)` 
 
 > **Ограничения-проверки:**   
-* CHECK (amount >= 0)    
-* CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business')) 
+
+`CHECK (amount >= 0)`    
+`CHECK (fare_conditions IN ('Economy', 'Comfort', 'Business'))` 
 
 > **Ограничения внешнего ключа:**    
-* FOREIGN KEY (flight_id) 
-REFERENCES flights(flight_id)    
-* FOREIGN KEY (ticket_no) 
-REFERENCES tickets(ticket_no) 
 
-> **Ссылки извне:**    
-* TABLE "boarding_passes" FOREIGN KEY (ticket_no, flight_id)         
-REFERENCES ticket_flights(ticket_no, flight_id)
+`FOREIGN KEY (flight_id) 
+REFERENCES flights(flight_id)` 
+
+`FOREIGN KEY (ticket_no) 
+REFERENCES tickets(ticket_no)`
+
+> **Ссылки извне:** 
+
+`TABLE "boarding_passes" FOREIGN KEY (ticket_no, flight_id)         
+REFERENCES ticket_flights(ticket_no, flight_id)`
 
 ---
 
@@ -272,14 +292,85 @@ REFERENCES ticket_flights(ticket_no, flight_id)
    `PRIMARY KEY, btree (ticket_no)`
   
   > **Ограничения внешнего ключа:**    
-  * FOREIGN KEY (book_ref) 
-  REFERENCES bookings(book_ref) 
   
-  > **Ссылки извне:**    
-  * TABLE "ticket_flights" 
+  `FOREIGN KEY (book_ref) 
+  REFERENCES bookings(book_ref)` 
+  
+  > **Ссылки извне:**   
+
+  `TABLE "ticket_flights" 
   FOREIGN KEY (ticket_no) 
-  REFERENCES tickets(ticket_no)
+  REFERENCES tickets(ticket_no)`
 
   ---
 
+### Представление "**bookings.flights_v**"
+
+Над таблицей flights создано представление flights_v, содержащее дополнительную информацию: 
+
+* расшифровку данных об аэропорте вылета (departure_airport, departure_airport_name, departure_city)
+* расшифровку данных об аэропорте прибытия (arrival_airport, arrival_airport_name, arrival_city)
+* местное время вылета (scheduled_departure_local, actual_departure_local)
+* местное время прибытия (scheduled_arrival_local, actual_arrival_local)
+* продолжительность полета (scheduled_duration, actual_duration)         
+
+ Столбец                   |     Тип     |       Описание    
+ ----------------          | ----------- | ---------------                     
+ flight_id                 | integer     | Идентификатор рейса 
+ flight_no                 | char(6)     | Номер рейса 
+ scheduled_departure       | timestamptz | Время вылета по расписанию 
+ scheduled_departure_local | timestamp   | Время вылета по расписанию, местное время в пункте отправления 
+ scheduled_arrival         | timestamptz | Время прилёта по расписанию 
+ scheduled_arrival_local   | timestamp   | Время прилёта по расписанию, местное время в пункте прибытия 
+ scheduled_duration        | interval    | Планируемая продолжительность полета 
+ departure_airport         | char(3)     | Код аэропорта отправления 
+ departure_airport_name    | text        | Название аэропорта отправления 
+ departure_city            | text        | Город отправления 
+ arrival_airport           | char(3)     | Код аэропорта прибытия 
+ arrival_airport_name      | text        | Название аэропорта прибытия 
+ arrival_city              | text        | Город прибытия 
+ status                    | varchar(20) | Статус рейса 
+ aircraft_code             | char(3)     | Код самолета, IATA 
+ actual_departure          | timestamptz | Фактическое время вылета 
+ actual_departure_local    | timestamp   | Фактическое время вылета, местное время в пункте отправления 
+ actual_arrival            | timestamptz | Фактическое время прилёта 
+ actual_arrival_local      | timestamp   | Фактическое время прилёта, местное время в пункте прибытия 
+ actual_duration           | interval    | Фактическая продолжительность полета
+
+---
+
 ### Представление "**view1**"
+
+Данное представление связывает домены "flights" и "airports". Созданное отношение позволяет нам получить информацию о городе отправления и городе прибытия по каждому рейсу исходя из того, в каких городах находятся данные аэропорты.
+
+Столбец                |    Тип    |              Описание   
+---------------        | --------- | ------------------------- 
+city_departure         |    text   | Город отправления
+city_arrival           |    text   | Город прибытия
+
+> **Синтаксис**
+
+`create view view1 as (
+	select a.city as city_departure, a2.city as city_arrival
+	from flights f 
+	join airports a on f.departure_airport = a.airport_code
+	join airports a2 on f.arrival_airport = a2.airport_code);`
+
+---
+
+### Материализованное представление "**bookings.routes**"
+
+Таблица рейсов содержит избыточность: из нее можно было бы выделить информацию о маршруте (номер рейса, аэропорты отправления и назначения), которая не зависит от конкретных дат рейсов. Именно такая информация и составляет материализованное представление routes.       
+
+Столбец                |    Тип    |              Описание   
+---------------        | --------- | -------------------------           
+flight_no              | char(6)   | Номер рейса 
+departure_airport      | char(3)   | Код аэропорта отправления 
+departure_airport_name | text      | Название аэропорта отправления
+departure_city         | text      | Город отправления 
+arrival_airport        | char(3)   | Код аэропорта прибытия 
+arrival_airport_name   | text      | Название аэропорта прибытия 
+arrival_city           | text      | Город прибытия 
+aircraft_code          | char(3)   | Код самолета, IATA 
+duration               | interval  | Продолжительность полета 
+days_of_week           | integer[] | Дни недели, когда выполняются рейсы
